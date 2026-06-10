@@ -30,5 +30,3 @@ print("create vector db")
 vector_store.add_documents(chunks)
 
 print("added to vector db")
-
-vector_store.persist()
