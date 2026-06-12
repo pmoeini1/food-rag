@@ -3,8 +3,11 @@ from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_chroma import Chroma
 from transformers import pipeline
 from pydantic import BaseModel
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+
+app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:3000"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
 
 class QueryRequest(BaseModel):
     question: str
@@ -35,7 +38,7 @@ def ask(req: QueryRequest):
 
         Answer: 
     """
-    output = pipe(prompt, max_new_tokens=300, do_sample=False)
+    output = pipe(prompt, max_new_tokens=30, do_sample=False)
     answer = output[0]["generated_text"]
 
     return {
