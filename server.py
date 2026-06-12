@@ -25,7 +25,7 @@ def ask(req: QueryRequest):
     context = "\n\n".join(doc.page_content for doc in docs)
 
     prompt = f"""
-        You are a nutrition research assistant.
+        You are a nutrition research assistant. If you can't answer the question given the context, say "I don't know".
 
         Context: 
         {context}
