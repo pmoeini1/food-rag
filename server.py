@@ -13,6 +13,10 @@ app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:3000"], allo
 class QueryRequest(BaseModel):
     question: str
 
+class QueryResponse(BaseModel):
+    answer: str
+    sources: list[str]
+
 embedding_model = HuggingFaceEmbeddings(model_name="BAAI/bge-small-en-v1.5")
 
 vector_store = Chroma(persist_directory="./nutrition_chroma", embedding_function=embedding_model)
@@ -27,7 +31,7 @@ def ask(req: QueryRequest):
     docs = retriever.invoke(req.question)
 
 
-    context = "\n\n".join(doc.page_content[:300] for doc in docs[:3])
+    context = "\n\n".join(doc.page_content[:400] for doc in docs[:3])
 
 
     prompt = f"""
@@ -44,10 +48,10 @@ def ask(req: QueryRequest):
     output = pipe(prompt, max_new_tokens=30, do_sample=False, return_full_text=False)
     answer = output[0]["generated_text"].split(".")[0]
 
-    return {
-        "answer": answer,
-        "sources": [
+    return QueryResponse(
+        answer=answer,
+        sources=[
             doc.metadata.get("source", "unknown")
             for doc in docs
         ]
-    }
+    )
